@@ -304,9 +304,11 @@ function startGameWithTurnaround() {
     const proceed = () => {
         if (showcaseBear && showcaseBear.visible) {
             const baseY = 4.65, dur = 900;
-            new TWEEN.Tween(showcaseBear.rotation).to({ y: Math.PI }, dur).easing(TWEEN.Easing.Cubic.InOut).start();
+            const easeRot = TWEEN.Easing?.Cubic?.InOut || ((k)=>k);
+            const easeWob = TWEEN.Easing?.Sine?.InOut || ((k)=>k);
+            new TWEEN.Tween(showcaseBear.rotation).to({ y: Math.PI }, dur).easing(easeRot).start();
             const wob = { t: 0 };
-            new TWEEN.Tween(wob).to({ t: 1 }, dur).easing(TWEEN.Easing.Sine.InOut)
+            new TWEEN.Tween(wob).to({ t: 1 }, dur).easing(easeWob)
               .onUpdate(()=>{ const phase = wob.t * Math.PI * 4; showcaseBear.rotation.z = Math.sin(phase) * 0.15; showcaseBear.position.y = baseY + Math.abs(Math.sin(phase)) * 0.10; })
               .onComplete(()=>{ showcaseBear.rotation.z = 0; showcaseBear.position.y = baseY; startGame(); __startingSequence = false; })
               .start();
