@@ -284,19 +284,20 @@ function throwShowcaseFish(done) {
     const hand = getHandAnchor(showcaseBear, 'right');
     const arm = showcaseBear.getObjectByName('rightArm');
     if (!hand || !arm) return done?.();
-    const easeInOut = TWEEN.Easing?.Sine?.InOut || ((k)=>k);
-    const easeOut = TWEEN.Easing?.Sine?.Out || ((k)=>k);
-    new TWEEN.Tween(arm.rotation).to({ x: -0.6 }, 140).easing(easeInOut).onComplete(()=>{
-        new TWEEN.Tween(arm.rotation).to({ x: 1.25 }, 180).easing(easeOut).onStart(()=>{
-            if (showcaseFish.parent) hand.remove(showcaseFish), scene.add(showcaseFish);
-            const dir = 1; // right hand
-            showcaseFish.userData.thrown = true;
-            showcaseFish.userData.velocity = new THREE.Vector3(0.22*dir, 0.36, 0.06);
-            showcaseFish.userData.angularVel = new THREE.Vector3((Math.random()*0.8-0.4), (Math.random()*1.6-0.8)*dir, (Math.random()*1.0-0.5));
-            playSFX(sounds.whoosh);
-            setTimeout(()=>{ try { scene.remove(showcaseFish); } catch {} showcaseFish = null; done?.(); }, 650);
-        }).start();
-    }).start();
+    const easeInOut = (TWEEN.Easing && TWEEN.Easing.Sine && TWEEN.Easing.Sine.InOut) || ((k)=>k);
+    const easeOut = (TWEEN.Easing && TWEEN.Easing.Sine && TWEEN.Easing.Sine.Out) || ((k)=>k);
+    const bend1 = new TWEEN.Tween(showcaseBear.rotation).to({ x: -0.28 }, 140).easing(easeInOut);
+    const prep  = new TWEEN.Tween(arm.rotation).to({ x: -0.6 }, 140).easing(easeInOut);
+    const throwTw = new TWEEN.Tween(arm.rotation).to({ x: 1.25 }, 180).easing(easeOut).onStart(()=>{
+        if (showcaseFish.parent) hand.remove(showcaseFish), scene.add(showcaseFish);
+        showcaseFish.userData.thrown = true;
+        showcaseFish.userData.velocity = new THREE.Vector3(0.22, 0.36, 0.06);
+        showcaseFish.userData.angularVel = new THREE.Vector3((Math.random()*0.8-0.4), (Math.random()*1.6-0.8), (Math.random()*1.0-0.5));
+        playSFX(sounds.whoosh);
+        setTimeout(()=>{ try { scene.remove(showcaseFish); } catch {} showcaseFish = null; done?.(); }, 650);
+    });
+    const recover = new TWEEN.Tween(showcaseBear.rotation).to({ x: 0 }, 220).easing(easeOut);
+    bend1.start(); prep.start(); bend1.chain(recover); prep.chain(throwTw);
 }
 
 function startGameWithTurnaround() {
@@ -309,18 +310,13 @@ function startGameWithTurnaround() {
             const easeWob = TWEEN.Easing?.Sine?.InOut || ((k)=>k);
             new TWEEN.Tween(showcaseBear.rotation).to({ y: Math.PI }, dur).easing(easeRot).start();
             const wob = { t: 0 };
-            const wobTw = new TWEEN.Tween(wob).to({ t: 1 }, dur).easing(easeWob)
-              .onUpdate(()=>{ 
-                  if (!showcaseBear) { try { wobTw.stop(); } catch {} return; }
-                  const phase = wob.t * Math.PI * 4; 
-                  showcaseBear.rotation.z = Math.sin(phase) * 0.15; 
-                  showcaseBear.position.y = baseY + Math.abs(Math.sin(phase)) * 0.10; 
-              })
-              .onComplete(()=>{ showcaseBear.rotation.z = 0; showcaseBear.position.y = baseY; startGame(); __startingSequence = false; })
+            new TWEEN.Tween(wob).to({ t: 1 }, dur).easing(easeWob)
+              .onUpdate(()=>{ const phase = wob.t * Math.PI * 4; showcaseBear.rotation.z = Math.sin(phase) * 0.15; showcaseBear.position.y = baseY + Math.abs(Math.sin(phase)) * 0.10; })
+              .onComplete(()=>{ showcaseBear.rotation.z = 0; showcaseBear.position.y = baseY; throwShowcaseFish(()=>{ startGame(); __startingSequence = false; }); })
               .start();
         } else { startGame(); __startingSequence = false; }
     };
-    if (showcaseFish && showcaseFish.parent !== scene) { throwShowcaseFish(proceed); } else { proceed(); }
+    proceed();
 }
 
 function gameOver() {
