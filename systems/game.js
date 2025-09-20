@@ -291,7 +291,7 @@ function throwShowcaseFish(done) {
     const throwTw = new TWEEN.Tween(arm.rotation).to({ x: 1.25 }, 180).easing(easeOut).onStart(()=>{
         if (showcaseFish.parent) hand.remove(showcaseFish), scene.add(showcaseFish);
         showcaseFish.userData.thrown = true;
-        showcaseFish.userData.velocity = new THREE.Vector3(0.22, 0.36, 0.06);
+        showcaseFish.userData.velocity = new THREE.Vector3(-0.22, 0.36, 0.06);
         showcaseFish.userData.angularVel = new THREE.Vector3((Math.random()*0.8-0.4), (Math.random()*1.6-0.8), (Math.random()*1.0-0.5));
         (async ()=>{ try { await initAudio(); } catch {} playSFX(sounds.whoosh); })();
         setTimeout(()=>{ try { scene.remove(showcaseFish); } catch {} showcaseFish = null; done?.(); }, 650);
