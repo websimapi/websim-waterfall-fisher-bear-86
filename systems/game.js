@@ -289,7 +289,13 @@ function throwShowcaseFish(done) {
     const bend1 = new TWEEN.Tween(showcaseBear.rotation).to({ x: -0.28 }, 140).easing(easeInOut);
     const prep  = new TWEEN.Tween(arm.rotation).to({ x: -0.6 }, 140).easing(easeInOut);
     const throwTw = new TWEEN.Tween(arm.rotation).to({ x: 1.25 }, 180).easing(easeOut).onStart(()=>{
+        // preserve world transform from hand before detaching
+        hand.updateMatrixWorld(true);
+        showcaseFish.updateMatrixWorld(true);
+        const wp = new THREE.Vector3(); const wq = new THREE.Quaternion();
+        showcaseFish.getWorldPosition(wp); showcaseFish.getWorldQuaternion(wq);
         if (showcaseFish.parent) hand.remove(showcaseFish), scene.add(showcaseFish);
+        showcaseFish.position.copy(wp); showcaseFish.quaternion.copy(wq);
         showcaseFish.userData.thrown = true;
         showcaseFish.userData.velocity = new THREE.Vector3(-0.22, 0.36, 0.06);
         showcaseFish.userData.angularVel = new THREE.Vector3((Math.random()*0.8-0.4), (Math.random()*1.6-0.8), (Math.random()*1.0-0.5));
@@ -519,7 +525,13 @@ function grabAndThrow(fish) {
     const bend1 = new TWEEN.Tween(bear.rotation).to({ x: -0.28 }, 140).easing(easeInOut);
     const prep  = new TWEEN.Tween(arm.rotation).to({ x: -0.6 }, 140).easing(easeInOut);
     const throwTw = new TWEEN.Tween(arm.rotation).to({ x: 1.25 }, 180).easing(easeOut).onStart(()=>{
+        // preserve world transform from hand before detaching
+        hand.updateMatrixWorld(true);
+        fish.updateMatrixWorld(true);
+        const wp = new THREE.Vector3(); const wq = new THREE.Quaternion();
+        fish.getWorldPosition(wp); fish.getWorldQuaternion(wq);
         if (fish.parent) hand.remove(fish), scene.add(fish);
+        fish.position.copy(wp); fish.quaternion.copy(wq);
         fish.userData.thrown = true;
         const dir = isRight?1:-1;
         fish.userData.velocity = new THREE.Vector3(0.22*dir, 0.36, 0.06);
