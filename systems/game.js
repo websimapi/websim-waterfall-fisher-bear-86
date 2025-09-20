@@ -293,7 +293,7 @@ function throwShowcaseFish(done) {
         showcaseFish.userData.thrown = true;
         showcaseFish.userData.velocity = new THREE.Vector3(0.22, 0.36, 0.06);
         showcaseFish.userData.angularVel = new THREE.Vector3((Math.random()*0.8-0.4), (Math.random()*1.6-0.8), (Math.random()*1.0-0.5));
-        playSFX(sounds.whoosh);
+        (async ()=>{ try { await initAudio(); } catch {} playSFX(sounds.whoosh); })();
         setTimeout(()=>{ try { scene.remove(showcaseFish); } catch {} showcaseFish = null; done?.(); }, 650);
     });
     const recover = new TWEEN.Tween(showcaseBear.rotation).to({ x: 0 }, 220).easing(easeOut);
@@ -477,6 +477,14 @@ export function updateGame() {
         if (showcaseBear) {
             const rightArm = showcaseBear.getObjectByName('rightArm');
             if (rightArm) rightArm.rotation.x = -Math.sin(gameState.idleAnimTimer) * 0.1;
+        }
+        // Update thrown showcase fish physics during start/retry animation
+        if (showcaseFish && showcaseFish.userData?.thrown) {
+            updateFish(showcaseFish);
+            if (showcaseFish.position.y < -10 || Math.abs(showcaseFish.position.x) > 30 || showcaseFish.position.z > 20) {
+                try { scene.remove(showcaseFish); } catch {}
+                showcaseFish = null;
+            }
         }
     }
 }
