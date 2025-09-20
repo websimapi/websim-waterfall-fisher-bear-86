@@ -1,5 +1,3 @@
-
-```javascript
 import * as THREE from 'three';
 import * as TWEEN from 'tween';
 import { scene } from '../scene.js';

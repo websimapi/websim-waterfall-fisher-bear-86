@@ -1,5 +1,3 @@
-
-```javascript
 import * as THREE from 'three';
 import { BEAR_X_LIMIT, updateBear, nudgeBearZ } from '../entities/bear.js';
 import { BEAR_Z_MIN, BEAR_Z_MAX } from '../entities/bear.js';
