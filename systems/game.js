@@ -1,8 +1,10 @@
+
+```javascript
 import * as THREE from 'three';
 import * as TWEEN from 'tween';
 import { scene } from '../scene.js';
 import { updateFish } from '../entities/fish.js';
-import { initAudio, wireAudioUnlock, playSFX, sounds, startWaterfall } from './audio.js';
+import { initAudio } from './audio.js';
 import { bindUI, updateUIValues, showHUD, showStart, populateUnlocks } from './ui.js';
 import { BEARS, FISH, getPlayerProgress, savePlayerProgress } from '../unlocks.js';
 import { updateSpawner, resetSpawner } from './fishSpawner.js';
@@ -23,7 +25,9 @@ export function initGame() {
   setupStartScreen();
   const { startButton } = bindUI();
   startButton.addEventListener('click', startGameWithTurnaround);
-  wireAudioUnlock(() => { initAudio(); startWaterfall?.(); });
+  import('./audio.js').then(({ wireAudioUnlock }) => {
+    wireAudioUnlock(() => { initAudio(); import('./audio.js').then(m => m.startWaterfall?.()); });
+  });
 }
 
 export function updateGame() {
@@ -49,7 +53,7 @@ export function updateGame() {
         const dx = Math.abs(f.position.x - bear.position.x);
         const withinX = dx <= half + buffer;
         if (withinX) {
-          playSFX(sounds.catch);
+          const { playSFX, sounds } = await import('./audio.js'); playSFX(sounds.catch);
           gameState.score += computeFishScore(f, gameState.streak);
           gameState.streak++;
           updateUIValues({ score: gameState.score, streak: gameState.streak });

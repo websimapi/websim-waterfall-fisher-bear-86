@@ -74,3 +74,4 @@ export function throwShowcaseFish(done) {
   const recover = new TWEEN.Tween(showcaseBear.rotation).to({ x: 0 }, 220).easing(easeOut);
   bend1.start(); prep.start(); bend1.chain(recover); prep.chain(throwTw);
 }
+
